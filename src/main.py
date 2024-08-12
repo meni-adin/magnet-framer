@@ -1,5 +1,6 @@
 from PIL import Image, ImageOps
 import argparse
+import itertools
 import json
 import logging
 import os
@@ -54,7 +55,7 @@ def crop_image(image):
 def scale_image(image, frame):
     scale_factor = current_config['scale-factor']
     scale_factor = scale_factor * min(frame.width / image.width, frame.height / image.height)
-    new_width = int(image.width * scale_factor)
+    new_width  = int(image.width * scale_factor)
     new_height = int(image.height * scale_factor)
     scaled_image = image.resize((new_width, new_height))
 
@@ -62,11 +63,11 @@ def scale_image(image, frame):
 
 def pad_image(image, frame):
     horizontal_correction = 0
-    vertical_correction = 0
+    vertical_correction   = 0
 
-    left_padding = ((frame.width - image.width) // 2) + horizontal_correction
-    top_padding = ((frame.height - image.height) // 2) + vertical_correction
-    right_padding = frame.width - image.width - left_padding
+    left_padding   = ((frame.width - image.width) // 2) + horizontal_correction
+    top_padding    = ((frame.height - image.height) // 2) + vertical_correction
+    right_padding  = frame.width - image.width - left_padding
     bottom_padding = frame.height - image.height - top_padding
 
     padding = (left_padding, top_padding, right_padding, bottom_padding)
@@ -128,9 +129,10 @@ def unset_current_config():
 def process():
     for filename in os.listdir(config.input):
         if filename.endswith('.jpg'):
+            counter = itertools.count(start=0)
+
             img_path = os.path.join(config.input, filename)
             logging.info(f'file {img_path} status: processing...')
-
 
             original_image = Image.open(img_path).convert('RGBA')
             logging.debug(f'Image loaded successfully')
@@ -138,7 +140,7 @@ def process():
             logging.debug(f'Image orientation: {image_orientation(original_image)}')
             set_current_config(original_image)
             if config.debug:
-                save_image(original_image, filename, '_0_original')
+                save_image(original_image, filename, f'_{next(counter)}_original')
 
             frame = Image.open(current_config['frame-path']).convert('RGBA')
             logging.debug(f'Frame loaded successfully')
@@ -148,25 +150,24 @@ def process():
             cropped_image = crop_image(original_image)
             logging.debug(f'Image cropped to size {cropped_image.size}')
             if config.debug:
-                save_image(cropped_image, filename, '_1_cropped')
+                save_image(cropped_image, filename, f'_{next(counter)}_cropped')
 
             scaled_image = scale_image(cropped_image, frame)
             logging.debug(f'Image scaled to size {scaled_image.size}')
             if config.debug:
-                save_image(scaled_image, filename, '_2_scaled')
+                save_image(scaled_image, filename, f'_{next(counter)}_scaled')
 
             padded_image = pad_image(scaled_image, frame)
             logging.debug(f'Image padded to size {padded_image.size}')
             if config.debug:
-                save_image(padded_image, filename, '_3_padded')
+                save_image(padded_image, filename, f'_{next(counter)}_padded')
 
             framed_image = frame_image(padded_image, frame)
             logging.debug(f'Image framed successfully')
 
-            save_image(framed_image, filename, '_4_framed' if config.debug else '_framed')
+            save_image(framed_image, filename, f'_{next(counter)}_framed' if config.debug else '_framed')
             unset_current_config()
             logging.info(f'file {img_path} status: done')
-
 
 def configure_logging(logLevel):
     logging.basicConfig(level=logLevel,
@@ -211,10 +212,7 @@ def verify_input():
 
 if __name__ == '__main__':
     configure()
-
     logging.info(f'--- {APP_NAME} start ---')
-
     verify_input()
     process()
-
     logging.info(f'---  {APP_NAME} End  ---')
