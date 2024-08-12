@@ -8,13 +8,13 @@ import pathlib
 APP_NAME         = 'magnet-framer'
 SCRIPT_DIR_PATH  = pathlib.Path(__file__).parent.resolve()
 CONFIG_FILE_PATH = os.path.join(SCRIPT_DIR_PATH, 'config.json')
-LOG_PATH         = f'{APP_NAME}.log'
+LOG_PATH         = os.path.join(SCRIPT_DIR_PATH, f'{APP_NAME}.log')
 
 json_config    = None
 config         = None
 current_config = None
 
-class Bleed:
+class Crop:
     def __init__(self, left, top, right, bottom):
         self.left   = left
         self.top    = top
@@ -45,8 +45,8 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 def crop_image(image):
-    bleed = current_config['bleed']
-    coordinates = bleed.left, bleed.top, image.width - bleed.right, image.height - bleed.bottom
+    crop = current_config['crop']
+    coordinates = crop.left, crop.top, image.width - crop.right, image.height - crop.bottom
     cropped_image = image.crop(coordinates)
 
     return cropped_image
@@ -108,13 +108,13 @@ def set_current_config(image):
     if image_orientation(image) == 'landscape':
         current_config = {
             'frame-path': json_config['land-frame-path'],
-            'bleed': Bleed(json_config['land-crop-left'], json_config['land-crop-top'], json_config['land-crop-right'], json_config['land-crop-bottom']),
+            'crop': Crop(json_config['land-crop-left'], json_config['land-crop-top'], json_config['land-crop-right'], json_config['land-crop-bottom']),
             'scale-factor': json_config['land-scale-factor'],
         }
     elif image_orientation(image) == 'portrait':
         current_config = {
             'frame-path': json_config['port-frame-path'],
-            'bleed': Bleed(json_config['port-crop-left'], json_config['port-crop-top'], json_config['port-crop-right'], json_config['port-crop-bottom']),
+            'crop': Crop(json_config['port-crop-left'], json_config['port-crop-top'], json_config['port-crop-right'], json_config['port-crop-bottom']),
             'scale-factor': json_config['port-scale-factor'],
         }
     else:
