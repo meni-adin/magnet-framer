@@ -87,11 +87,11 @@ def frame_image(image, frame):
 
 def image_orientation(image):
     if (image.width > image.height):
-        return "landscape"
+        return 'landscape'
     elif (image.width < image.height):
-        return "portrait"
+        return 'portrait'
     else:
-        return "square"
+        return 'square'
 
 def output_filename_with_postfix(filename, postfix):
     splitted_filename = os.path.splitext(filename)
@@ -101,7 +101,7 @@ def output_filename_with_postfix(filename, postfix):
 
 def save_image(image, filename, postfix):
     final_name = output_filename_with_postfix(filename, postfix)
-    image.convert("RGB").save(final_name)
+    image.convert('RGB').save(final_name)
 
 def set_current_config(image):
     global current_config
@@ -114,7 +114,7 @@ def set_current_config(image):
     elif image_orientation(image) == 'portrait':
         current_config = {
             'frame-path': json_config['port-frame-path'],
-            "bleed": Bleed(json_config['port-crop-left'], json_config['port-crop-top'], json_config['port-crop-right'], json_config['port-crop-bottom']),
+            'bleed': Bleed(json_config['port-crop-left'], json_config['port-crop-top'], json_config['port-crop-right'], json_config['port-crop-bottom']),
             'scale-factor': json_config['port-scale-factor'],
         }
     else:
@@ -127,12 +127,12 @@ def unset_current_config():
 
 def process():
     for filename in os.listdir(config.input):
-        if filename.endswith(".jpg"):
+        if filename.endswith('.jpg'):
             img_path = os.path.join(config.input, filename)
             logging.info(f'file {img_path} status: processing...')
 
 
-            original_image = Image.open(img_path).convert("RGBA")
+            original_image = Image.open(img_path).convert('RGBA')
             logging.debug(f'Image loaded successfully')
             logging.debug(f'Image size: {original_image.size}')
             logging.debug(f'Image orientation: {image_orientation(original_image)}')
@@ -140,7 +140,7 @@ def process():
             if config.debug:
                 save_image(original_image, filename, '_0_original')
 
-            frame = Image.open(current_config['frame-path']).convert("RGBA")
+            frame = Image.open(current_config['frame-path']).convert('RGBA')
             logging.debug(f'Frame loaded successfully')
             logging.debug(f'Frame size: {frame.size}')
             logging.debug(f'Frame orientation: {image_orientation(frame)}')
@@ -186,13 +186,13 @@ def configure():
     with open(CONFIG_FILE_PATH, 'r') as f:
         json_config = json.load(f)
 
-    parser = argparse.ArgumentParser(description="Prepare images for printing on magnets")
+    parser = argparse.ArgumentParser(description='Prepare images for printing on magnets')
 
     parser.add_argument('-i', '--input'          , type=str           , help='Path to input files directory' , default=json_config['input-path'])
     parser.add_argument('-o', '--output'         , type=str           , help='Path to output files directory', default=json_config['output-path'])
     parser.add_argument('-l', '--landscape-frame', type=str           , help='Path to landscape frame file'  , default=json_config['land-frame-path'])
     parser.add_argument('-p', '--portrait-frame' , type=str           , help='Path to portrait frame file'   , default=json_config['port-frame-path'])
-    parser.add_argument('-d', '--debug'          , action='store_true', help="Run in debug mode"             , default=json_config['debug'])
+    parser.add_argument('-d', '--debug'          , action='store_true', help='Run in debug mode'             , default=json_config['debug'])
 
     config = parser.parse_args()
 
@@ -209,7 +209,7 @@ def verify_input():
         logging.error(f'Output directory {config.output} does not exist')
         exit(1)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     configure()
 
     logging.info(f'--- {APP_NAME} start ---')
