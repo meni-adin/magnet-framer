@@ -1,17 +1,18 @@
 {
     "input-path": "samples/input",
     "output-path": "samples/output",
-    "land-frame-path": "samples/landscape_frame.png",
+    "land-frame-path": "samples/frames/landscape_frame.png",
     "land-crop-left": 100,
     "land-crop-top": 0,
     "land-crop-right": 100,
     "land-crop-bottom": 0,
     "land-scale-factor": 1.0,
-    "port-frame-path": "samples/portrait_frame.png",
+    "port-frame-path": "samples/frames/portrait_frame.png",
     "port-crop-left": 0,
     "port-crop-top": 100,
     "port-crop-right": 0,
     "port-crop-bottom": 100,
     "port-scale-factor": 1.0,
-    "debug": true
+    "rotate-to-landscape": true,
+    "debug": false
 }

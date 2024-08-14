@@ -86,6 +86,11 @@ def frame_image(image, frame):
 
     return framed_image
 
+def rotate_image(image):
+    rotated_image = image.rotate(90, expand=True)
+
+    return rotated_image
+
 def image_orientation(image):
     if (image.width > image.height):
         return 'landscape'
@@ -165,7 +170,12 @@ def process():
             framed_image = frame_image(padded_image, frame)
             logging.debug(f'Image framed successfully')
 
-            save_image(framed_image, filename, f'_{next(counter)}_framed' if config.debug else '_framed')
+            if (json_config['rotate-to-landscape'] and image_orientation(original_image) == 'portrait'):
+                final_image = rotate_image(framed_image)
+            else:
+                final_image = framed_image
+
+            save_image(final_image, filename, f'_{next(counter)}_framed' if config.debug else '_framed')
             unset_current_config()
             logging.info(f'file {img_path} status: done')
 
